@@ -72,7 +72,7 @@ private
     gl.glDisable(GL::GL_TEXTURE_2D)
     gl.glBegin(GL::GL_QUAD_STRIP)
 
-    @v = Vec3D.new(0, 1, 0)
+    v = Vec3D.new(0, 1, 0)
     trail_length = @trail.length
 
     (trail_length - 1).times do |i|
@@ -84,7 +84,7 @@ private
       zp = point.z
 
       perp0 = @trail[i].sub(@trail[i+1])
-      perp1 = perp0.cross(@v).normalize
+      perp1 = perp0.cross(v).normalize
       perp2 = perp0.cross(perp1).normalize
       perp1 = perp0.cross(perp2).normalize
 
@@ -122,7 +122,7 @@ private
       y0 = point.y - nextpoint.y
       z0 = point.z - nextpoint.z
 
-      # perp1 = perp0.cross(@v).normalize
+      # perp1 = perp0.cross(Vec3D.new(0, 1, 0)).normalize
       length = Math.sqrt(z0 * z0 + x0 * x0)
       if length != 0
         x1 = -z0 / length
