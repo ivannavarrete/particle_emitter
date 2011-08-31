@@ -3,7 +3,7 @@ require 'particle.rb'
 
 class Emitter
 
-  def initialize
+  def initialize(options = {})
     @emitter_img = $app.loadImage('data/emitter.png')
     @particle_img = $app.loadImage('data/particle.png')
 
@@ -12,6 +12,7 @@ class Emitter
     @color = {:r => 1.0, :g => 1.0, :b => 1.0}
     @diameter = 70
 
+    @options = options
     @particles = []
   end
 
@@ -27,6 +28,10 @@ class Emitter
     n.times { @particles << Particle.new(@position, @velocity, options) }
   end
 
+  def options=(options)
+    @options.merge!(options)
+  end
+
 private
 
   def set_velocity
@@ -36,6 +41,11 @@ private
 
   def set_position
     @position.addSelf(@velocity)
+
+    if @options[:allow_floor] && @position.y > FLOORLEVEL
+      @position.setComponent(1, FLOORLEVEL)
+      @velocity.setComponent(1, 0)
+    end
   end
 
   def draw_emitter(pgl, gl, squarelist)

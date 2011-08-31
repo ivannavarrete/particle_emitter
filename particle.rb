@@ -9,7 +9,9 @@ class Particle
     @age = 0                            # goes from 0 to @lifespan
     @age_countdown =  1.0               # goes from 1.0 to 0.0 as particle ages
     @lifespan = @diameter.to_i          # the bigger you are the longer you live
-    @is_dead = false
+
+    @bounce_age = 2
+    @bouncing = false
 
     # randomize starting position so that particles don't all start on the same pixel
     @position = position.add(Vec3D.randomVector.scaleSelf($app.random(5.0)))
@@ -45,6 +47,7 @@ class Particle
   end
 
   def is_dead?
+    # particle is dead if it reached it's lifespan or traveled out of view
     @age >= @lifespan || @position.x < 0 || @position.x > $app.width ||
                          @position.y < 0 || @position.y > $app.height
   end
@@ -53,6 +56,10 @@ private
 
   def set_velocity
     @velocity.addSelf(GRAVITY) if @options[:allow_gravity]
+
+    # slow down particle and reverse y direction on floor bounce
+    @bouncing = @options[:allow_floor] && @position.y + @velocity.y > FLOORLEVEL
+    @velocity.scaleSelf(0.75, -0.375, 0.75) if @bouncing
   end
 
   def set_position
@@ -63,7 +70,21 @@ private
   end
 
   def set_age
-    @age += 1 if @age < @lifespan
+    return if @age >= @lifespan
+
+    # modify aging if we have a floor
+    if @options[:allow_floor]
+      if @bouncing
+        @age += @bounce_age
+        @bounce_age += 1
+      else
+        @age += 0.6
+      end
+    else
+      @age += 1
+    end
+
+
     @age_countdown = 1.0 - @age.to_f / @lifespan.to_f
   end
 

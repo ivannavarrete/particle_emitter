@@ -12,13 +12,12 @@ java_import 'toxi.geom.Vec3D'
 
 
 GRAVITY = Vec3D.new(0, 0.35, 0)
+FLOORLEVEL = 400
 
 
 class SourceParticles < Processing::App
 
   def setup
-    @emitter = Emitter.new
-
     render_mode(OPENGL)
     color_mode(RGB, 1.0)
 
@@ -37,7 +36,10 @@ class SourceParticles < Processing::App
 
     # options; turning all of them on will slow things down
     @options = {:allow_gravity => false,      # gravity vector
-                :allow_trails => false}       # particle trails
+                :allow_trails => false,       # particle trails
+                :allow_floor => false}        # add a floor
+
+    @emitter = Emitter.new(@options)
   end
 
   def draw
@@ -71,9 +73,12 @@ class SourceParticles < Processing::App
     case key.to_s.downcase
       when 'g' then @options[:allow_gravity] = ! @options[:allow_gravity]
       when 't' then @options[:allow_trails]  = ! @options[:allow_trails]
+      when 'f' then @options[:allow_floor]   = ! @options[:allow_floor]
       when 'n' then @emitter.add_particles(1, @options)
       when 'q' then exit()
     end
+
+    @emitter.options = @options
   end
 
 end
